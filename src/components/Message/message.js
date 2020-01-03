@@ -26,7 +26,7 @@ export class message extends Component {
                 {this.props.message.name}:
             </span>
              {this.props.message.text}
-             <span><i class="far fa-trash-alt"></i></span>
+             <span style={{display:"inline-block",fontSize:"15px"}}><i class="far fa-trash-alt"></i></span>
             {this.state.popup && popUpWindow}
   </div>
         )

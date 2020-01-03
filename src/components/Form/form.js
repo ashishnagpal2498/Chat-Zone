@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Message from '../Message/message'
 import './form.css'
 import firebase from 'firebase'
+
 // let counter = 1;
 export class form extends Component {
     constructor(props) {
@@ -13,7 +14,7 @@ export class form extends Component {
             list: [],
             deleteAccess: false
         };
-        this.messageRef = firebase.database().ref().child('messages');
+        // this.messageRef = firebase.database().ref().child('messages');
         this.listenMessages();
         console.log(this.state)
     }
@@ -33,7 +34,16 @@ export class form extends Component {
         // TODO 5: Return the user's display name.
         return firebase.auth().currentUser.displayName;
     }
+    isAuthenticated = ()=>{
+            // TODO 6: Return true if a user is signed-in.
+            // console.log('This Authenticated')
+            return !!firebase.auth().currentUser;
+    }
     handleSend() {
+        if(!this.isAuthenticated())
+        {  
+            return alert('You Must Sign In first');
+        }
         if (this.state.message) {
             //   var newItem = {
             //     userName: this.state.userName,
@@ -75,7 +85,7 @@ export class form extends Component {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'removed') {
                     // deleteMessage(change.doc.id);
-                } else {
+                } else if(change.type==='added') {
                     var message = change.doc.data();
                     // displayMessage(change.doc.id, message.timestamp, message.name,
                     //        message.text, message.profilePicUrl, message.imageUrl);

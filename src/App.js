@@ -5,6 +5,7 @@ import Form from './components/Form/form.js';
 import firebase from 'firebase';
 import firebaseConfig from './config.json';
 import User from './components/User/user.js'
+
 firebase.initializeApp(firebaseConfig.firebaseConfig);
 class App extends Component {
   constructor(props) {
