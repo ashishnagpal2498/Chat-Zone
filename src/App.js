@@ -7,6 +7,12 @@ import firebaseConfig from './config.json';
 import User from './components/User/user.js'
 
 firebase.initializeApp(firebaseConfig.firebaseConfig);
+/**
+ * @classdec class App
+ * 
+ * @constructor which calls its super class -
+ * @memberof class componentDidMount
+ */
 class App extends Component {
   constructor(props) {
     super(props);
