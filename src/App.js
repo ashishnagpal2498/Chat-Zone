@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  // Link
+} from "react-router-dom";
 import Form from './components/Form/form.js';
+//Global Import
 import firebase from 'firebase';
-import firebaseConfig from './config.json';
+import {initializeFirebase} from './firebase-file'
+// import firebaseConfig from './config.json';
 import User from './components/User/user.js'
 
-firebase.initializeApp(firebaseConfig.firebaseConfig);
+// firebase.initializeApp(firebaseConfig.firebaseConfig);
+
 /**
  * @classdec class App
  * 
@@ -38,7 +47,10 @@ class App extends Component {
   // }
   render() {
     return (
-      <div className="app">
+      <Router>
+        <Switch>
+        <Route exact path="/">
+        <div className="app">
         <div className="app__header">
           <img src={logo} className="app__logo" alt="logo" />
           <h2>
@@ -66,6 +78,14 @@ class App extends Component {
           <Form user={this.state.user} />
         </div>
       </div>
+        </Route>
+      <Route path=""><h3>Invalid Path</h3></Route>
+        </Switch>
+        {/* <Route path="/firebase-messaging-sw.js">
+          <p>hello</p>
+        </Route> */}
+      </Router>
+     
     );
   }
 }

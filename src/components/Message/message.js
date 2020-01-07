@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './message.css'
-import firebase from 'firebase'
+// import firebase from 'firebase'
 function popUpWindow(){
     return (
         <div style={{width:"100vw",height:"100vh",backgroundColor:"rgba(0,0,0,0.2)",position:"fixed"}}>
@@ -19,9 +19,24 @@ export class message extends Component {
     state={
         popup:false
     }
+    componentWillReceiveProps(nextProps)
+    {
+        // if(this.props!==nextProps)
+        // {
+        //     bgColorMsg = {...bgColorMsg,
+        //         backgroundColor: "green"
+        //     }
+        //     setTimeout(()=>{
+        //         bgColorMsg = {...bgColorMsg,
+        //             backgroundColor: "rgba(0, 0, 0, .05)"
+        //         }
+        //     },500)
+        // }
+    }
     render() {
+        
         return (
-            <div className="message">
+            <div className="message" style={bgColorMsg}>
             <span className="message__author">
                 {this.props.message.name}:
             </span>
@@ -36,6 +51,9 @@ const buttonStyle = {
     padding:"10px",
     color: "white",
     backgroundColor:"black"
+}
+let bgColorMsg = {
+    backgroundColor: "rgba(0, 0, 0, .05)"
 }
 
 export default message

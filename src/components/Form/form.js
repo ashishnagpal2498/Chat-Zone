@@ -2,8 +2,13 @@ import React, { Component } from 'react'
 import Message from '../Message/message'
 import './form.css'
 import firebase from 'firebase'
-
+import {initializeFirebase} from '../../firebase-file'
+import axios from 'axios';
 // let counter = 1;
+const headers = {
+    "Content-Type": "application/json",
+    "Authorization": "key=AAAAMGQK9UU:APA91bHb4mdJAm0EfoihSx_RMPdC7Hc5b9xrhlXLcjccHJniY4wW6Uo2KLN5zffvJRx6BgtWXInODI5dR9PnTf2oHPjmZXHiCrh8ZMt1Kz1H92iu4gN3slslhJxxkRVCbATd4rSVafBD"
+}
 export class form extends Component {
     constructor(props) {
         super(props)
@@ -11,12 +16,48 @@ export class form extends Component {
         this.state = {
             userName: 'Sebastian',
             message: '',
-            list: [],
+            list: [] ,
             deleteAccess: false
         };
         // this.messageRef = firebase.database().ref().child('messages');
         this.listenMessages();
         console.log(this.state)
+    }
+    componentWillMount(){
+       const messaging = firebase.messaging()
+    //    messaging.usePublicVapidKey("BLgUlaRmTk-5e71RRFqaHyujQ7GWRMhnUXaVl65l2P-ZYBKSeDdE-g3a7NqUksRUyjgP6j2BN6TZkZCqnNRxPJQ")
+       //Permission request
+        messaging.requestPermission().then((permission) => {
+            // if (permission === 'granted') {
+              console.log('Notification permission granted.');
+              // TODO(developer): Retrieve an Instance ID token for use with FCM.
+              // ...
+            // } else {
+            //   console.log('Unable to get permission to notify.');
+            // }
+            return messaging.getToken()
+          }).then((token)=>{
+                console.log(token);
+                //create a topic - 
+                //store firebase messaging tokens
+                //Impt - Subscribe the user to that topic -
+                const data = {};
+                axios.post(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/message`,data,{
+                    headers: headers
+                }).then((obj)=>{
+                    console.log(obj);
+                })
+                localStorage.setItem('token',token)
+          }).catch((err)=>{
+              console.error('Permission denied',err)
+          })
+          messaging.onMessage((payload)=>{
+
+              console.log('Same Page',payload)
+          })
+
+    
+
     }
     componentWillReceiveProps(nextProps) {
     }
@@ -31,11 +72,11 @@ export class form extends Component {
 
     // Returns the signed-in user's display name.
     getUserName = () => {
-        // TODO 5: Return the user's display name.
+        //Return the user's display name.
         return firebase.auth().currentUser.displayName;
     }
     isAuthenticated = ()=>{
-            // TODO 6: Return true if a user is signed-in.
+            //Return true if a user is signed-in.
             // console.log('This Authenticated')
             return !!firebase.auth().currentUser;
     }
@@ -50,6 +91,24 @@ export class form extends Component {
             //     message: this.state.message,
             //   }
             //   this.messageRef.push(newItem);
+           
+          const notification =  {
+                "notification": {
+                    "title": "Firebase",
+                    "body": `${this.state.message}`,
+                    "click_action": "http://localhost:3000/",
+                    "icon": "http://url-to-an-icon/icon.png"
+                },
+                to: "/topics/message"
+            }
+            const token = localStorage.getItem('token')
+            axios.post(`https://fcm.googleapis.com/fcm/send`,notification,{
+                headers: headers
+            }).then(()=>{
+                console.log('Notification send')
+            })
+                
+
             firebase.firestore().collection('messages').add({
                 name: this.getUserName(),
                 text: this.state.message,
@@ -90,7 +149,11 @@ export class form extends Component {
                     // displayMessage(change.doc.id, message.timestamp, message.name,
                     //        message.text, message.profilePicUrl, message.imageUrl);
                     console.log(message)
-
+                    
+                    //Set The message to localhost -
+                    //-- if same window - then - colour the message -
+                    //Timeout - 
+                    localStorage.setItem('newMsg',message)
                     // if(counter===1)
                     this.setState({
                         list: [...this.state.list, message]
