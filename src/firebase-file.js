@@ -15,6 +15,7 @@ export const initializeFirebase = () => {
   navigator.serviceWorker
   .register('./firebase-messaging-sw.js')
   .then((registration) => {
+      console.log('Fire ServiceWorker')
     firebase.messaging().useServiceWorker(registration);
   });
 

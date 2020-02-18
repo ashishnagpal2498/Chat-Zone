@@ -17,7 +17,7 @@
   width: 100%;
   max-width: 600px;
   padding: 20px;
-  margin: 0 auto;
+  margin: 20px auto;
 }
 .app__button {
   border: 0;
@@ -35,4 +35,12 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+.form_outer{
+  padding: 15px 10px;
+  background-color: #000;
+  color: white;
+}
+#audio{
+  display: none;
 }

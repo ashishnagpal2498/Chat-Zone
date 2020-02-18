@@ -2,121 +2,74 @@ import React, { Component } from 'react'
 import Message from '../Message/message'
 import './form.css'
 import firebase from 'firebase'
-import {initializeFirebase} from '../../firebase-file'
+import '../Message/message.css'
+// import { initializeFirebase } from '../../firebase-file'
 import axios from 'axios';
+import { addToDB, notificationGenerator, notificationObjGenerator } from '../../firebase-functions'
+import { isAuthenticated, getProfilePicUrl, getUserName} from '../../getUserInfo'
 // let counter = 1;
 const headers = {
     "Content-Type": "application/json",
     "Authorization": "key=AAAAMGQK9UU:APA91bHb4mdJAm0EfoihSx_RMPdC7Hc5b9xrhlXLcjccHJniY4wW6Uo2KLN5zffvJRx6BgtWXInODI5dR9PnTf2oHPjmZXHiCrh8ZMt1Kz1H92iu4gN3slslhJxxkRVCbATd4rSVafBD"
 }
+var counter = 1;
+var scrollH;
+var snapshotLength;
 export class form extends Component {
     constructor(props) {
         super(props)
         console.log(firebase.firestore)
         this.state = {
-            userName: 'Sebastian',
             message: '',
-            list: [] ,
-            deleteAccess: false
+            list: [],
+            deleteAccess: false,
+            color: []
+
         };
         // this.messageRef = firebase.database().ref().child('messages');
-        this.listenMessages();
-        console.log(this.state)
+
+        // console.log(this.state)
     }
-    componentWillMount(){
-       const messaging = firebase.messaging()
-    //    messaging.usePublicVapidKey("BLgUlaRmTk-5e71RRFqaHyujQ7GWRMhnUXaVl65l2P-ZYBKSeDdE-g3a7NqUksRUyjgP6j2BN6TZkZCqnNRxPJQ")
-       //Permission request
-        messaging.requestPermission().then((permission) => {
-            // if (permission === 'granted') {
-              console.log('Notification permission granted.');
-              // TODO(developer): Retrieve an Instance ID token for use with FCM.
-              // ...
-            // } else {
-            //   console.log('Unable to get permission to notify.');
-            // }
-            return messaging.getToken()
-          }).then((token)=>{
-                console.log(token);
-                //create a topic - 
-                //store firebase messaging tokens
-                //Impt - Subscribe the user to that topic -
-                const data = {};
-                axios.post(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/message`,data,{
-                    headers: headers
-                }).then((obj)=>{
-                    console.log(obj);
-                })
-                localStorage.setItem('token',token)
-          }).catch((err)=>{
-              console.error('Permission denied',err)
-          })
-          messaging.onMessage((payload)=>{
-
-              console.log('Same Page',payload)
-          })
-
-    
-
+    componentWillMount() {
+        this.listenMessages();
+        notificationGenerator(headers);
+        // console.log(this.getUserToken())
+        // if(this.getUserToken())
+        //{    // }
+        // if(token!==null) this.setState({token:token})
     }
     componentWillReceiveProps(nextProps) {
     }
     handleChange(event) {
         this.setState({ message: event.target.value });
     }
-    getProfilePicUrl = () => {
-        // TODO 4: Return the user's profile pic URL.
-        return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
 
-    }
-
-    // Returns the signed-in user's display name.
-    getUserName = () => {
-        //Return the user's display name.
-        return firebase.auth().currentUser.displayName;
-    }
-    isAuthenticated = ()=>{
-            //Return true if a user is signed-in.
-            // console.log('This Authenticated')
-            return !!firebase.auth().currentUser;
-    }
     handleSend() {
-        if(!this.isAuthenticated())
-        {  
+        if (!isAuthenticated()) {
             return alert('You Must Sign In first');
         }
         if (this.state.message) {
-            //   var newItem = {
-            //     userName: this.state.userName,
-            //     message: this.state.message,
-            //   }
-            //   this.messageRef.push(newItem);
-           
-          const notification =  {
-                "notification": {
-                    "title": "Firebase",
-                    "body": `${this.state.message}`,
-                    "click_action": "http://localhost:3000/",
-                    "icon": "http://url-to-an-icon/icon.png"
-                },
-                to: "/topics/message"
-            }
-            const token = localStorage.getItem('token')
-            axios.post(`https://fcm.googleapis.com/fcm/send`,notification,{
+            const notification = notificationObjGenerator(this.state.message, window.location.protocol)
+            //Send Notification to all the users who have subscribed to the topic
+            axios.post(`https://fcm.googleapis.com/fcm/send`, notification, {
                 headers: headers
-            }).then(()=>{
+            }).then(() => {
+                // Play audio -  
+                // let audioItem = document.getElementById('audio')
+                // audioItem.play();
+                //--->
+                // SCROLLING THE WINDOW ON NEW MESSAGE
+                let form_div = document.getElementById("form__message")
+                console.log('SET SCROLL')
+                if (counter === 1) {
+                    console.log('counter is 1')
+                    scrollH = form_div.scrollHeight - form_div.offsetHeight
+                    console.log(form_div.scrollHeight - form_div.offsetHeight)
+                    form_div.scrollTop = scrollH;
+                }
                 console.log('Notification send')
             })
-                
-
-            firebase.firestore().collection('messages').add({
-                name: this.getUserName(),
-                text: this.state.message,
-                // profilePicUrl:getProfilePicUrl(),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch((err) => {
-                console.error('Error in Writing New Message', err)
-            })
+            addToDB(getUserName, getProfilePicUrl, this.state.message)
             this.setState({ message: '' });
         }
     }
@@ -125,56 +78,76 @@ export class form extends Component {
         this.handleSend();
     }
     listenMessages() {
-        // this.messageRef
-        //   .limitToLast(10)
-        //   .on('value', message => {
-        //     this.setState({
-        //       list: Object.values(message.val()),
-        //     });
-        //   });
+        //Instead of fetching all the data again Paginate- 
+        //store the last value length and set the start at value -
+        //SnapShot will be created once --
+
+        // Start listening to the query.
+        // if (counter === 1) {
+        // this.setState({ list: [] })
         var query = firebase.firestore()
             .collection('messages')
             .orderBy('timestamp', 'desc')
-            .limit(12);
-
-        // Start listening to the query.
         query.onSnapshot((snapshot) => {
-            //empty the list
-            //  this.setState({list:[]});
+            snapshotLength = snapshot.docs.length;
+            console.log(snapshotLength)
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'removed') {
-                    // deleteMessage(change.doc.id);
-                } else if(change.type==='added') {
+                } else if (change.type === 'added') {
                     var message = change.doc.data();
-                    // displayMessage(change.doc.id, message.timestamp, message.name,
-                    //        message.text, message.profilePicUrl, message.imageUrl);
-                    console.log(message)
-                    
-                    //Set The message to localhost -
-                    //-- if same window - then - colour the message -
-                    //Timeout - 
-                    localStorage.setItem('newMsg',message)
-                    // if(counter===1)
+                    console.log("message", message)
                     this.setState({
                         list: [...this.state.list, message]
                     })
-
-                    // else{
-
-                    // }
                 }
+                let mylist = [...this.state.list]
+                mylist.sort((item1, item2) => {
+                    return item1.timestamp.seconds - item2.timestamp.seconds
+                })
+                this.setState({
+                    list: [...mylist]
+                })
+
             });
         });
+        //Code To create snapshot again and unsubscribe previous - implement Pagination
 
     }
+    loadData = () => {
+        console.log('Scroll event')
+        let ab = document.getElementById("form__message")
+        console.log(ab.scrollTop)
+        //Implement - scrolling and bringing the new data on scrollTop = 0 
+    }
+    setScroll = () => {
+        //Setting scroll to bottom on load of data
+        let form_div = document.getElementById("form__message")
+        console.log('SET SCROLL')
+        if (counter === 1) {
+            console.log('counter is 1')
+            scrollH = form_div.scrollHeight - form_div.offsetHeight
+            console.log(form_div.scrollHeight - form_div.offsetHeight)
+            form_div.scrollTop = scrollH;
+        }
+    }
     render() {
+
         return (
             <div className="form">
-                <div className="form__message">
-                    {this.state.list.map((item, index) =>
-                        <Message key={index} message={item} deleteAcess={this.state.deleteAccess} />
+                <ul className="form__message" id="form__message" onLoad={this.setScroll} >
+
+                    {this.state.list.length > 0 && this.state.list.map((item, index) => {
+                        let num = []
+                        for (let i = 0; i < 3; i++)  num[i] = (Math.floor((Math.random() * 1000))) % 255
+                        item.color = `rgb(${num[0]},${num[1]},${num[2]})`
+                        // console.log('tokens check',getUserToken(),item.token)
+                        return (<li key={index} className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
+                            <Message color={item.color} message={item} deleteAcess={this.state.deleteAccess} />
+                            <div className="message-arrow"></div>
+                        </li>)
+                    }
                     )}
-                </div>
+                </ul>
                 <div className="form__row">
                     <input
                         className="form__input"
@@ -195,5 +168,5 @@ export class form extends Component {
         );
     }
 }
-
+//notification and query check
 export default form

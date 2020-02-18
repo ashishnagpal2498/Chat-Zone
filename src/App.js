@@ -30,6 +30,7 @@ class App extends Component {
     }
   }
   componentDidMount() {
+    //Keeps a check on state change of user in firebase
     firebase.auth().onAuthStateChanged(user => {
       this.setState({ user });
     });
@@ -41,10 +42,6 @@ class App extends Component {
   handleLogOut() {
     firebase.auth().signOut();
   }
-  // getUserName = () =>{
-  //   // TODO 5: Return the user's display name.
-  //   return firebase.auth().currentUser.displayName;
-  // }
   render() {
     return (
       <Router>
@@ -52,12 +49,12 @@ class App extends Component {
         <Route exact path="/">
         <div className="app">
         <div className="app__header">
-          <img src={logo} className="app__logo" alt="logo" />
+          {/* <img src={logo} className="app__logo" alt="logo" /> */}
           <h2>
-            SIMPLE APP WITH REACT
+            Chat App
           </h2>
           { !this.state.user ? (
-            <button
+            <button style={{textAlign:"right"}}
               className="app__button"
               onClick={this.handleSignIn.bind(this)}
             >
@@ -72,18 +69,19 @@ class App extends Component {
             </button> 
            
           )}
-          {this.state.user &&  <User url={firebase.auth().currentUser.photoURL} userName={firebase.auth().currentUser.displayName}/>}
+          {/* {this.state.user && console.log(this.state.user)} */}
         </div>
         <div className="app__list">
+          <div className="form_outer">
+          {this.state.user &&  <User url={this.state.user.photoURL} userName={this.state.user.displayName}/>}
+          {/* <audio src="./audio_file.wav" id="audio"></audio> */}
+          </div>
           <Form user={this.state.user} />
         </div>
       </div>
         </Route>
       <Route path=""><h3>Invalid Path</h3></Route>
         </Switch>
-        {/* <Route path="/firebase-messaging-sw.js">
-          <p>hello</p>
-        </Route> */}
       </Router>
      
     );
