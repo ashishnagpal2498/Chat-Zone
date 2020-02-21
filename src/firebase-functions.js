@@ -49,11 +49,11 @@ export function notificationObjGenerator(message,protocol){
     
     return {
         "notification": {
-            "title": "Firebase",
+            "title": "Chat App",
             "body": `${message}`,
-            // "sound":"./audio_file.wav",
+            "sound":"/audio_file.wav",
             "click_action": `${protocol==="http"?"http://localhost:3000/":"https://fir-reactapp-d05b3.firebaseapp.com/"}`,
-            "icon": "./notification-icon.png"
+            "icon": "/notificationBell.png"
         },
         to: "/topics/message"
     }
