@@ -23,8 +23,8 @@ export class form extends Component {
             message: '',
             list: [],
             deleteAccess: false,
-            color: []
-
+            color: [],
+            prevDate: ""
         };
         // this.messageRef = firebase.database().ref().child('messages');
 
@@ -93,11 +93,28 @@ export class form extends Component {
             console.log(snapshotLength)
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'removed') {
-                } else if (change.type === 'added') {
+                    //Item removed
+                    console.log("removed ---- ",change.doc.id);
+                    let list = JSON.parse(JSON.stringify(this.state.list));
+                    list = list.filter(item=> item.id !== change.doc.id)
+                    this.setState({list})
+                } 
+                else if(change.type === 'modified'){
+                    console.log('Modified');
+                    let list = JSON.parse(JSON.stringify(this.state.list))
+                    list.forEach(item => {if(item.id === change.doc.id) {console.log('item',item,change.doc.data());item.text = change.doc.data().text;}} )
+                    this.setState({list})
+                }
+                else if (change.type === 'added') 
+                {   console.log('CHange  ',change.doc.id)
                     var message = change.doc.data();
                     console.log("message", message)
+                    let customObj = {
+                        ...message,
+                        id: change.doc.id
+                    }
                     this.setState({
-                        list: [...this.state.list, message]
+                        list: [...this.state.list, customObj]
                     })
                 }
                 let mylist = [...this.state.list]
@@ -140,11 +157,23 @@ export class form extends Component {
                         let num = []
                         for (let i = 0; i < 3; i++)  num[i] = (Math.floor((Math.random() * 1000))) % 255
                         item.color = `rgb(${num[0]},${num[1]},${num[2]})`
+                        let currItemDate =  new Date(item.timestamp.seconds*1000).toDateString()
+                        if(index > 0 && this.state.prevDate !== new Date(this.state.list[index-1].timestamp.seconds*1000))
+                        {
+                        }
                         // console.log('tokens check',getUserToken(),item.token)
-                        return (<li key={index} className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
-                            <Message color={item.color} message={item} deleteAcess={this.state.deleteAccess} />
+                        return <React.Fragment>
+                            {this.state.prevDate !== currItemDate &&
+                        <p>
+                         {currItemDate}
+                        </p>
+                            }    
+                         <li key={index} className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
+                            <Message color={item.color} message={item} deleteAccess={localStorage.getItem('token') === item.token ? true : false } />
                             <div className="message-arrow"></div>
-                        </li>)
+                        </li>
+                        </React.Fragment>
+                        
                     }
                     )}
                 </ul>

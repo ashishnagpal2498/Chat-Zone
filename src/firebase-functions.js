@@ -58,3 +58,20 @@ export function notificationObjGenerator(message,protocol){
         to: "/topics/message"
     }
 }
+
+export function deleteMessage(id)
+{   console.log('ID ',id)
+    
+    firebase.firestore().collection("messages").doc(`${id}`).delete().then(()=>{
+        console.log('Deleted SuccessFully')
+    }).catch(()=>{
+        console.log('Error in delete')
+    })
+}
+
+export function updateMessage(text,id){
+    console.log('Update , ',id);
+    firebase.firestore().collection("messages").doc(`${id}`).update({
+        text: text
+    })
+}

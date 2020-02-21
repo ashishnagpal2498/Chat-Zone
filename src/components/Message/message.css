@@ -37,6 +37,20 @@
     box-shadow: 0 0 6px 1px rgba(0, 0, 0,0.25);
     z-index: 2;
 }
+.message-content-options{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 5px;
+}
+.message-content-options button{
+    margin-right: 5px;
+    padding: 0;
+    border: none;
+    font-size: 10px;
+    background: none;
+    cursor: pointer;
+}
 
 
 .message.left .message-arrow{
