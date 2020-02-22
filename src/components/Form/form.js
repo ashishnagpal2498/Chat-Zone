@@ -1,44 +1,34 @@
 import React, { Component } from 'react'
-import Message from '../Message/message'
+import Message from '../Message/Message'
 import './form.css'
 import firebase from 'firebase'
 import '../Message/message.css'
-// import { initializeFirebase } from '../../firebase-file'
 import axios from 'axios';
-import { addToDB, notificationGenerator, notificationObjGenerator } from '../../firebase-functions'
+import { addToDB, notificationObjGenerator } from '../../firebase-functions'
 import { isAuthenticated, getProfilePicUrl, getUserName} from '../../getUserInfo'
+import firebaseConfig from '../../config.json'
 // let counter = 1;
-const headers = {
-    "Content-Type": "application/json",
-    "Authorization": "key=AAAAMGQK9UU:APA91bHb4mdJAm0EfoihSx_RMPdC7Hc5b9xrhlXLcjccHJniY4wW6Uo2KLN5zffvJRx6BgtWXInODI5dR9PnTf2oHPjmZXHiCrh8ZMt1Kz1H92iu4gN3slslhJxxkRVCbATd4rSVafBD"
-}
+
 var counter = 1;
 var scrollH;
 var snapshotLength;
-export class form extends Component {
-    constructor(props) {
-        super(props)
-        console.log(firebase.firestore)
-        this.state = {
+export class Form extends Component {
+
+
+        state = {
             message: '',
             list: [],
             deleteAccess: false,
             color: [],
-            prevDate: ""
+            prevDate: "",
+            loader:true
         };
-        // this.messageRef = firebase.database().ref().child('messages');
-
-        // console.log(this.state)
-    }
+    
     componentWillMount() {
+        //Check if user Exist -  then only listen to messages - snapshot -
+        console.log('Authenticated ',isAuthenticated(),this.props.user)
+   
         this.listenMessages();
-        notificationGenerator(headers);
-        // console.log(this.getUserToken())
-        // if(this.getUserToken())
-        //{    // }
-        // if(token!==null) this.setState({token:token})
-    }
-    componentWillReceiveProps(nextProps) {
     }
     handleChange(event) {
         this.setState({ message: event.target.value });
@@ -51,8 +41,9 @@ export class form extends Component {
         if (this.state.message) {
             const notification = notificationObjGenerator(this.state.message, window.location.protocol)
             //Send Notification to all the users who have subscribed to the topic
+            console.log('Notification ',notification)
             axios.post(`https://fcm.googleapis.com/fcm/send`, notification, {
-                headers: headers
+                headers: firebaseConfig.headers
             }).then(() => {
                 // Play audio -  
                 // let audioItem = document.getElementById('audio')
@@ -160,15 +151,16 @@ export class form extends Component {
                         let currItemDate =  new Date(item.timestamp.seconds*1000).toDateString()
                         if(index > 0 && this.state.prevDate !== new Date(this.state.list[index-1].timestamp.seconds*1000))
                         {
+                            // Date bifercation - 
                         }
                         // console.log('tokens check',getUserToken(),item.token)
-                        return <React.Fragment>
+                        return <React.Fragment key={index}>
                             {this.state.prevDate !== currItemDate &&
                         <p>
                          {currItemDate}
                         </p>
                             }    
-                         <li key={index} className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
+                         <li  className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
                             <Message color={item.color} message={item} deleteAccess={localStorage.getItem('token') === item.token ? true : false } />
                             <div className="message-arrow"></div>
                         </li>
@@ -198,4 +190,4 @@ export class form extends Component {
     }
 }
 //notification and query check
-export default form
+export default Form

@@ -7,12 +7,12 @@ import {
   Route,
   // Link
 } from "react-router-dom";
-import Form from './components/Form/form.js';
+import Form from './components/Form/Form.js';
 //Global Import
 import firebase from 'firebase';
-import {initializeFirebase} from './firebase-file'
+// import {initializeFirebase} from './firebase-file'
 // import firebaseConfig from './config.json';
-import User from './components/User/user.js'
+import User from './components/User/User.js'
 
 // firebase.initializeApp(firebaseConfig.firebaseConfig);
 
@@ -32,6 +32,7 @@ class App extends Component {
   componentDidMount() {
     //Keeps a check on state change of user in firebase
     firebase.auth().onAuthStateChanged(user => {
+      
       this.setState({ user });
     });
   }

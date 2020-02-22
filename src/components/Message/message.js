@@ -17,7 +17,7 @@ import {deleteMessage,updateMessage} from '../../firebase-functions'
 //         </div>
 //     )
 // }
-export class message extends Component {
+export class Message extends Component {
     state = {
         popup: false,
         token: null,
@@ -130,4 +130,4 @@ let bgColorMsg = {
 }
 
 
-export default message
+export default Message
