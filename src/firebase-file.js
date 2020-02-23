@@ -1,5 +1,4 @@
 import firebase from 'firebase';
-// import * as firebaseCon from './config.json'
 
 export const initializeFirebase = () => {
   firebase.initializeApp({
@@ -15,7 +14,6 @@ export const initializeFirebase = () => {
   navigator.serviceWorker
   .register('./firebase-messaging-sw.js')
   .then((registration) => {
-      console.log('Fire ServiceWorker')
     firebase.messaging().useServiceWorker(registration);
   });
 

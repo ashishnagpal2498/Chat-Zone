@@ -8,6 +8,7 @@ import {
 import Form from './components/Form/Form.js';
 import firebase from 'firebase';
 import User from './components/User/User.js'
+import { saveMessagingToken } from './firebase-functions';
 
 /**
  * @classdec class App
@@ -24,16 +25,20 @@ class App extends Component {
   }
   componentDidMount() {
     //Keeps a check on state change of user in firebase
-    firebase.auth().onAuthStateChanged(user => {
-      
-      this.setState({ user });
-    });
+    firebase.auth().onAuthStateChanged(this.authStateObserver);
+  }
+  authStateObserver = (user)=>{
+    if(user)
+    {this.setState({ user });
+      saveMessagingToken()
+    }
   }
   handleSignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider);
   }
   handleLogOut() {
+    this.setState({user:null})
     firebase.auth().signOut();
   }
   render() {
@@ -62,14 +67,17 @@ class App extends Component {
             </button> 
            
           )}
-          {/* {this.state.user && console.log(this.state.user)} */}
         </div>
         <div className="app__list">
           <div className="form_outer">
-          {this.state.user &&  <User url={this.state.user.photoURL} userName={this.state.user.displayName}/>}
-          {/* <audio src="./audio_file.wav" id="audio"></audio> */}
-          </div>
-          <Form user={this.state.user} />
+          {<User url={this.state.user ? this.state.user.photoURL : '/user_img.png'} userName={this.state.user ?this.state.user.displayName: ''}/>}
+         </div>
+         {this.state.user ? <Form user={this.state.user}  /> 
+         :
+         <div className="signInDiv">
+          <p> <i className="fas fa-exclamation-triangle"></i> Sign In to chat</p>
+           </div>
+         }
         </div>
       </div>
         </Route>

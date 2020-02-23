@@ -11,8 +11,7 @@ export function addToDB(getUserName,getProfilePicUrl,message){
         token: localStorage.getItem('token'),
         timestamp: new Date()
     }).then(() => {
-        console.log('Add Function COmpleted')
-        console.log(firebase.firestore.FieldValue.serverTimestamp())
+
     }).catch((err) => {
         console.error('Error in Writing New Message', err)
     })
@@ -29,8 +28,8 @@ export function saveMessagingToken(){
             headers: firebaseConfig.headers
         }).then(() => {
         })
-        messaging.onMessage((payload) => {
-             console.log('Same Page', payload)
+        messaging.onMessage(() => {
+
         })
         localStorage.setItem('token', currentToken)    
         } else {
