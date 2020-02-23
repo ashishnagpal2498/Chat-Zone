@@ -137,9 +137,9 @@ export class Form extends Component {
                             }
                             return <React.Fragment key={index}>
                                 {prevDate !== currItemDate &&
-                                    <p>
-                                        {today === currItemDate ? 'Today' : yesterday === currItemDate ? 'Yesterday' : currItemDate}
-                                    </p>
+                                    <li className="dateSeparater">
+                                       <span> {today === currItemDate ? 'Today' : yesterday === currItemDate ? 'Yesterday' : currItemDate} </span>
+                                    </li>
                                 }
                                 <li className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
                                     <Message color={this.state.color.filter(val => val.token === item.token)[0]} message={item} deleteAccess={localStorage.getItem('token') === item.token ? true : false} />

@@ -79,3 +79,15 @@
     padding: 0;
     overflow-y: scroll;
 }
+.dateSeparater{
+    flex-basis: 100%;
+    text-align: center;
+    font-size: 13px;
+    margin: 2px 0;
+}
+.dateSeparater span{
+    background-color: darkkhaki;
+    padding: 7px;
+    display: inline-block;
+    border-radius: 10px;
+}
