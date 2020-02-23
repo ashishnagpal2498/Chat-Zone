@@ -49,7 +49,7 @@ class App extends Component {
         <div className="app">
         <div className="app__header">
           <h2>
-            Chat App
+            Chat Zone
           </h2>
           { !this.state.user ? (
             <button style={{textAlign:"right"}}

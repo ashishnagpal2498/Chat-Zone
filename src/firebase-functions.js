@@ -54,7 +54,7 @@ export function notificationObjGenerator(message,protocol){
     
     return {
         "notification": {
-            "title": "Chat App",
+            "title": "Chat Zone",
             "body": `${message}`,
             "sound":"/audio_file.wav",
             "click_action": `${protocol==="http"?"http://localhost:3000/":"https://fir-reactapp-d05b3.firebaseapp.com/"}`,

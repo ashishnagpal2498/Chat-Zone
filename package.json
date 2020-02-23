@@ -10,6 +10,7 @@
     "curl": "^0.1.4",
     "firebase": "^7.6.1",
     "firebase-admin": "^8.9.0",
+    "firebase-tools": "^7.13.1",
     "react": "^16.12.0",
     "react-bidirectional-infinite-scroll": "^2.0.1",
     "react-dom": "^16.12.0",
