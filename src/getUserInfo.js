@@ -13,6 +13,7 @@ export const getUserName = () => {
 export const isAuthenticated = () => {
     //Return true if a user is signed-in.
     // console.log('This Authenticated')
+    console.log('Current User',firebase.auth().currentUser)
     return !!firebase.auth().currentUser;
 }
 export const getUserToken = () => {

@@ -1,8 +1,10 @@
 import firebase from 'firebase'
 import axios from 'axios'
-// export const token = null
+import firebaseConfig from './config.json'
+
 export function addToDB(getUserName,getProfilePicUrl,message){
     firebase.firestore().collection('messages').add({
+        uid: firebase.auth().currentUser.uid,
         name: getUserName(),
         text: message,
         profilePicUrl: getProfilePicUrl(),
@@ -15,9 +17,39 @@ export function addToDB(getUserName,getProfilePicUrl,message){
         console.error('Error in Writing New Message', err)
     })
 }
-export function notificationGenerator(headers){
+export function saveMessagingToken(){
     const messaging = firebase.messaging()
-   
+    messaging.getToken().then(function(currentToken) {
+        if (currentToken) {
+          // Saving the Device Token to the datastore.
+          firebase.firestore().collection('fcmTokens').doc(firebase.auth().currentUser.uid)
+              .set({token: currentToken});
+          // Subscribe to the messaging topic
+          axios.post(`https://iid.googleapis.com/iid/v1/${currentToken}/rel/topics/message`, {}, {
+            headers: firebaseConfig.headers
+        }).then(() => {
+        })
+        messaging.onMessage((payload) => {
+             console.log('Same Page', payload)
+        })
+        localStorage.setItem('token', currentToken)    
+        } else {
+          // Need to request permissions to show notifications.
+          requestNotificationsPermissions();
+        }
+      }).catch(function(error){
+        console.error('Unable to get messaging token.', error);
+      });
+}
+export function requestNotificationsPermissions(){
+  
+    //Permission request
+    firebase.messaging().requestPermission().then(function() {
+        // Notification permission granted.
+        saveMessagingToken();
+      }).catch(function(error) {
+        console.error('Unable to get permission to notify.', error);
+      });
 }
 export function notificationObjGenerator(message,protocol){
     
@@ -25,7 +57,7 @@ export function notificationObjGenerator(message,protocol){
         "notification": {
             "title": "Chat App",
             "body": `${message}`,
-            "sound":"audio_file",
+            "sound":"/audio_file.wav",
             "click_action": `${protocol==="http"?"http://localhost:3000/":"https://fir-reactapp-d05b3.firebaseapp.com/"}`,
             "icon": "/notificationBell.png"
         },
@@ -34,17 +66,12 @@ export function notificationObjGenerator(message,protocol){
 }
 
 export function deleteMessage(id)
-{   console.log('ID ',id)
-    
-    firebase.firestore().collection("messages").doc(`${id}`).delete().then(()=>{
-        console.log('Deleted SuccessFully')
+{   firebase.firestore().collection("messages").doc(`${id}`).delete().then(()=>{
     }).catch(()=>{
-        console.log('Error in delete')
     })
 }
 
 export function updateMessage(text,id){
-    console.log('Update , ',id);
     firebase.firestore().collection("messages").doc(`${id}`).update({
         text: text
     })

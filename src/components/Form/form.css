@@ -5,6 +5,40 @@
     width: 100%;
     border-left: 1px solid;
     border-bottom: 1px solid;
+   
+}
+.formLoaderDiv{
+    position: relative;
+    min-height: 400px;
+    width: 100%;
+}
+.formLoaderBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.formLoaderBox .loader {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -45%);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 4px solid #e5eef4;
+    border-top: 5px solid black;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 .form__row {
     display: flex;

@@ -12,6 +12,7 @@ import firebaseConfig from '../../config.json'
 var counter = 1;
 var scrollH;
 var snapshotLength;
+let prevDate;
 export class Form extends Component {
 
 
@@ -27,8 +28,28 @@ export class Form extends Component {
     componentWillMount() {
         //Check if user Exist -  then only listen to messages - snapshot -
         console.log('Authenticated ',isAuthenticated(),this.props.user)
-   
-        this.listenMessages();
+         if(isAuthenticated())
+        {   this.listenMessages();
+        //Get al the tokens -
+            let color = [];
+            firebase.firestore().collection('fcmTokens').get().then((tokens)=>{
+        // if(tokens.exist)
+        // console.log('fcmTokens',tokens.docs[0].data())
+        //
+        let num = [];
+      
+        tokens.forEach(item=>{
+            for(let i=0;i<3;i++) num[i] = Math.floor((Math.random()*1000)%255)
+            let obj = {
+                color: `rgb(${num[0]},${num[1]},${num[2]})`,
+                token: item.data().token
+            }
+            console.log(item.data());
+            color.push(obj);
+        })
+        this.setState({color},()=>console.log('color set',color))
+       });
+    }
     }
     handleChange(event) {
         this.setState({ message: event.target.value });
@@ -45,10 +66,6 @@ export class Form extends Component {
             axios.post(`https://fcm.googleapis.com/fcm/send`, notification, {
                 headers: firebaseConfig.headers
             }).then(() => {
-                // Play audio -  
-                // let audioItem = document.getElementById('audio')
-                // audioItem.play();
-                //--->
                 // SCROLLING THE WINDOW ON NEW MESSAGE
                 let form_div = document.getElementById("form__message")
                 console.log('SET SCROLL')
@@ -108,15 +125,17 @@ export class Form extends Component {
                         list: [...this.state.list, customObj]
                     })
                 }
-                let mylist = [...this.state.list]
-                mylist.sort((item1, item2) => {
-                    return item1.timestamp.seconds - item2.timestamp.seconds
-                })
-                this.setState({
-                    list: [...mylist]
-                })
+               
 
             });
+            let mylist = [...this.state.list]
+            mylist.sort((item1, item2) => {
+                return item1.timestamp.seconds - item2.timestamp.seconds
+            })
+            this.setState({
+                list: [...mylist],
+                loader: !(snapshotLength === mylist.length)
+            },()=>{console.log('fghnj',this.state.loader)})
         });
         //Code To create snapshot again and unsubscribe previous - implement Pagination
 
@@ -142,26 +161,36 @@ export class Form extends Component {
 
         return (
             <div className="form">
+                {this.state.loader && isAuthenticated() ? 
+                <div className="formLoaderDiv">
+                 <div className="formLoaderBox">
+                 <div className="loader"></div>
+                 </div>
+             </div> :
+              !isAuthenticated () ? <p>No data SignIn First</p>: 
                 <ul className="form__message" id="form__message" onLoad={this.setScroll} >
 
                     {this.state.list.length > 0 && this.state.list.map((item, index) => {
-                        let num = []
-                        for (let i = 0; i < 3; i++)  num[i] = (Math.floor((Math.random() * 1000))) % 255
-                        item.color = `rgb(${num[0]},${num[1]},${num[2]})`
                         let currItemDate =  new Date(item.timestamp.seconds*1000).toDateString()
-                        if(index > 0 && this.state.prevDate !== new Date(this.state.list[index-1].timestamp.seconds*1000))
+                        let today = new Date().toDateString()
+                        let yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate()-1)
+                        yesterday = yesterday.toDateString()
+                        if(index > 0 && prevDate !== new Date(this.state.list[index-1].timestamp.seconds*1000).toDateString())
                         {
                             // Date bifercation - 
+                            prevDate = new Date(this.state.list[index-1].timestamp.seconds*1000).toDateString()
+                            console.log('prevDate',prevDate)
                         }
                         // console.log('tokens check',getUserToken(),item.token)
                         return <React.Fragment key={index}>
-                            {this.state.prevDate !== currItemDate &&
+                            {prevDate !== currItemDate &&
                         <p>
-                         {currItemDate}
+                         {today === currItemDate ? 'Today' : yesterday === currItemDate ? 'Yesterday'  : currItemDate}
                         </p>
                             }    
                          <li  className={localStorage.getItem('token') !== item.token ? "message left" : "message message-align right"}  >
-                            <Message color={item.color} message={item} deleteAccess={localStorage.getItem('token') === item.token ? true : false } />
+                            <Message color={this.state.color.filter(val => val.token === item.token)[0]} message={item} deleteAccess={localStorage.getItem('token') === item.token ? true : false } />
                             <div className="message-arrow"></div>
                         </li>
                         </React.Fragment>
@@ -169,6 +198,7 @@ export class Form extends Component {
                     }
                     )}
                 </ul>
+    }
                 <div className="form__row">
                     <input
                         className="form__input"

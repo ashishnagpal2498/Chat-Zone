@@ -52,7 +52,10 @@
     cursor: pointer;
 }
 
-
+.message-text{
+    margin: 0;
+     padding: 0 10px 
+}
 .message.left .message-arrow{
     left:1px;
     transform: skew(-25deg, -25deg);
@@ -94,3 +97,51 @@
     transform: translate(-50%,-50%);
     border-radius: 100%;
 }
+.editMessage{
+    border: none;
+    border-bottom: 1px solid black;
+    width: 100%;
+    color: darkgray;
+}
+.editMessage:focus{
+    outline: none;
+}
+.popupModal{
+    width: 100vw ;
+    top:0;
+    left:0;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.2);
+     position: fixed
+}
+.popupModalContent{
+    position: absolute;
+    height: 40%;
+    width: 40%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+}
+.btns-div{
+   padding-top: 20px;
+}
+.btnStyle{
+    padding: 10px;
+    color: #fefefe;
+    background-color: black;
+    border: none;
+    margin: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btn-success{
+    background-color: green;
+    
+}
+.btn-danger{
+    background-color: indianred;
+}
+

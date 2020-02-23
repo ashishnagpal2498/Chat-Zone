@@ -1,20 +1,13 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  // Link
 } from "react-router-dom";
 import Form from './components/Form/Form.js';
-//Global Import
 import firebase from 'firebase';
-// import {initializeFirebase} from './firebase-file'
-// import firebaseConfig from './config.json';
 import User from './components/User/User.js'
-
-// firebase.initializeApp(firebaseConfig.firebaseConfig);
 
 /**
  * @classdec class App
@@ -50,7 +43,6 @@ class App extends Component {
         <Route exact path="/">
         <div className="app">
         <div className="app__header">
-          {/* <img src={logo} className="app__logo" alt="logo" /> */}
           <h2>
             Chat App
           </h2>

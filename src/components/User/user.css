@@ -1,0 +1,14 @@
+.imageOuter{
+	padding-left:40px;
+	position:relative;
+	font-size: 20px;
+	text-align: left;
+}
+.userImage{
+	border-radius:100px;
+	width:30px;
+	height:30px;
+	position:absolute;
+	left:0;
+	top:0;
+}
