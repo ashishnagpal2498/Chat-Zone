@@ -10,6 +10,12 @@
 * Firebase Messaging
 * Web Workers and Push API
 
+### Configration Setup
+* Install firebase-tools
+* Clone app
+* Create a firebase project in google console and enable firestore
+* Enable Messaging API 
+
 ##### Initial Screen of the Web App
 ![](projectImages/firebaseProject1.png)
 
