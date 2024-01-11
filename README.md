@@ -16,17 +16,17 @@
 * Create a firebase project in google console and enable firestore
 * Enable Messaging API 
 
-##### Initial Screen of the Web App
+#### Initial Screen of the Web App
 ![](projectImages/firebaseProject1.png)
 
-##### Loading Screen After Authentication
+#### Loading Screen After Authentication
 ![](projectImages/firebaseProject2.png)
 
-##### App
+#### App
 ![](projectImages/firebaseProject3.png)
 
-##### Delete Message Confirmation
+#### Delete Message Confirmation
 ![](projectImages/firebaseProject4.png)
 
-##### Final Message Edited
+#### Final Message Edited
 ![](projectImages/firebaseProject5.png)
